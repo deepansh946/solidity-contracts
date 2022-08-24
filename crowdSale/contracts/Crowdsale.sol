@@ -20,6 +20,7 @@ contract CrowdSale {
     uint8 public conversionRateForEth = 50;
     uint8 public startTime;
     uint8 public endTime;
+    uint256 totalSupply = 100000;
     mapping(address => uint256) balances;
 
     // Change the money variable to something more explainable
@@ -40,22 +41,17 @@ contract CrowdSale {
         return t;
     }
 
-    function buyToken(uint256 _amount, address _address)
+    function buyToken(address _address)
         public
         payable
         saleIsLive
     {
-        require(
-            _amount < 100000,
-            "CrowdSale: Amount should be less than total supply."
-        );
-        require(
-            balances[_address] < maxAllocationPerUser,
-            "CrowdSale: User already have max allocated tokens."
-        );
-
+        uint256 _amount = msg.value;
         uint256 tokensBought = getNumberOfTokens(_amount);
         uint256 total = SafeMath.add(balances[_address], tokensBought);
+
+        require(total < maxAllocationPerUser, "Crowdsale: User balance exceeds max allocation!");
+        require(tokensBought < totalSupply, "Crowdsale: Can't buy tokens more than total supply!");
 
         balances[_address] = total;
         token.transferFrom(msg.sender, _address, tokensBought);
