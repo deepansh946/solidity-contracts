@@ -18,6 +18,7 @@
     "typechain": "^8.1.0"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.3"
+    "@openzeppelin/contracts": "^4.7.3",
+    "ethereum-waffle": "^3.4.4"
   }
 }

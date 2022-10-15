@@ -15,10 +15,10 @@ contract Marketplace {
     address marketplaceOwnerAddress;
 
     mapping(address => mapping(uint => uint)) saleOrders;
-    mapping(uint => address) assetOwners;
-    mapping(uint => uint) assetPrices;
-    mapping(uint => bool) assetsSold;
-    mapping(uint => uint) numberOfAssets;
+    mapping(uint => address) public assetOwners;
+    mapping(uint => uint) public assetPrices;
+    mapping(uint => bool) public assetsSold;
+    mapping(uint => uint) public numberOfAssets;
 
     string uri;
 
@@ -37,11 +37,7 @@ contract Marketplace {
     }
 
     function _isContract(address addr) internal view returns (bool) {
-        uint256 size;
-        assembly {
-            size := extcodesize(addr)
-        }
-        return size > 0;
+        return addr.code.length > 0;
     }
 
     function createSale(
@@ -66,13 +62,14 @@ contract Marketplace {
     }
 
     function buyAsset(uint _id) public payable {
-        uint value = SafeMath.div(1, 2);
-        uint fee = SafeMath.div(assetPrices[_id], value);
+        uint value = SafeMath.mul(assetPrices[_id], 55);
+        uint fee = SafeMath.div(value, 100);
 
-        require(
-            _isContract(marketplaceOwnerAddress),
-            "Marketplace: Address can not receive funds"
-        );
+        // TODO: How to put marketplace address?
+        // require(
+        //     _isContract(marketplaceOwnerAddress),
+        //     "Marketplace: Address can not receive funds"
+        // );
 
         require(
             msg.sender != assetOwners[_id],
@@ -108,5 +105,21 @@ contract Marketplace {
         );
 
         emit AssetSold(_id);
+    }
+
+    function setMarketplaceOwnerAddress(address _address) external {
+        marketplaceOwnerAddress = _address;
+    }
+
+    function onERC721Received(
+        address,
+        address,
+        uint256,
+        bytes calldata
+    ) pure external returns (bytes4) {
+        return
+            bytes4(
+                keccak256("onERC721Received(address,address,uint256,bytes)")
+            );
     }
 }

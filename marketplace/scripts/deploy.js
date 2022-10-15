@@ -6,18 +6,28 @@
 // global scope, and execute the script.
 const hre = require('hardhat')
 
-const ETH_TOKEN_ADDRESS = '0x00000000219ab540356cbb839cbe05303d7705fa'
-const ASSET_ADDRESS = '0x5cC3108884AF30D0B4A32263173dc905FB5e97B3'
-
 async function main() {
+  const Token = await hre.ethers.getContractFactory('Token')
+  const token = await Token.deploy('test', 'T')
+
+  await token.deployed()
+  console.log('token deployed!')
+
+  console.log(token.address)
+
+  const Asset = await hre.ethers.getContractFactory('Asset')
+  const asset = await Token.deploy('https://google.com')
+
+  await asset.deployed()
+  console.log(asset.address)
+  console.log('asset deployed!')
+
   const Marketplace = await hre.ethers.getContractFactory('Marketplace')
-  const marketplace = await Marketplace.deploy(ASSET_ADDRESS, ETH_TOKEN_ADDRESS)
+  const marketplace = await Marketplace.deploy(asset.address, token.address)
 
   await marketplace.deployed()
+  console.log(marketplace.address)
   console.log('Marketplace deployed!')
-
-  const { address } = marketplace
-  console.log(address)
 }
 
 // We recommend this pattern to be able to use async/await everywhere
